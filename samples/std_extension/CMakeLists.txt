@@ -1,0 +1,4 @@
+# std_extension samples test
+add_executable(std_extension_test main.cpp)
+target_link_libraries(std_extension_test PRIVATE std_extension)
+target_compile_features(std_extension_test PRIVATE cxx_std_23)

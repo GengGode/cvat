@@ -1,0 +1,4 @@
+.vcpkg-root
+/.vscode
+/.vs
+/build
