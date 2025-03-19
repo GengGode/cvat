@@ -16,3 +16,9 @@ RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
 # [Optional] Uncomment this section to install additional packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev mesa-common-dev libgl1-mesa-dev pkg-config
+
+# Set up the display
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends xvfb
+RUN Xvfb :0 -screen 0 1024x768x24 &
+RUN export DISPLAY=:0
