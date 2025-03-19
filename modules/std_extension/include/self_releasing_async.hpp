@@ -69,6 +69,7 @@ namespace ctd
                         stop_source.request_stop();
                 }
                 runner_cv.notify_all();
+                std::unique_lock run_lock(runner_mutex);
             }
 
             std::thread::id register_task(std::string name, std::thread::id id, std::shared_future<void> future)
