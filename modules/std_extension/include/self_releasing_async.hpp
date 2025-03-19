@@ -4,11 +4,16 @@
 #include <map>
 #include <shared_mutex>
 // #include <string>
-// #include <thread>
+#include <thread>
 // #include <condition_variable>
 
-#include <windows.h>
-#pragma comment(lib, "winmm.lib")
+#if defined(_WIN32) || defined(_WIN64)
+    #include <windows.h>
+    #pragma comment(lib, "winmm.lib")
+#elif defined(__linux__)
+    #include <time.h>
+    #include <unistd.h>
+#endif
 
 namespace ctd
 {
@@ -161,8 +166,9 @@ namespace ctd
                 auto task = std::async(std::launch::async,
                                        [this, &id_promise, forever_stop_token = std::move(forever_stop_token), interval, fn = std::forward<Fn>(fn), ... args = std::forward<Args>(args)]() mutable {
                                            id_promise.set_value(std::this_thread::get_id());
-
-                                           timeBeginPeriod(1);  
+#if defined(_WIN32) || defined(_WIN64)
+                                           timeBeginPeriod(1);
+#endif
                                            auto next_until = std::chrono::high_resolution_clock::now() + interval;
 
                                            auto stop_token = runner_stop_source.get_token();
@@ -184,7 +190,9 @@ namespace ctd
 
                                                next_until += interval;
                                            }
+#if defined(_WIN32) || defined(_WIN64)
                                            timeEndPeriod(1);
+#endif
                                        });
 
                 return register_task(name, id_promise.get_future().get(), task.share(), forever_stop_source);
@@ -198,7 +206,7 @@ namespace ctd
                 auto task = std::async(std::launch::async,
                                        [this, &id_promise, forever_stop_token = std::move(forever_stop_token), interval, fn = std::forward<Fn>(fn), ... args = std::forward<Args>(args)]() mutable {
                                            id_promise.set_value(std::this_thread::get_id());
-
+#if defined(_WIN32) || defined(_WIN64)
                                            timeBeginPeriod(1);
                                            LARGE_INTEGER freq;
                                            ::QueryPerformanceFrequency(&freq);
@@ -207,13 +215,23 @@ namespace ctd
                                            LARGE_INTEGER next_time;
                                            ::QueryPerformanceCounter(&next_time);
                                            next_time.QuadPart += interval_counts;
-
+#elif defined(__linux__)
+                                            struct timespec next_time;
+                                            clock_gettime(CLOCK_MONOTONIC, &next_time);
+                                            next_time.tv_nsec += interval.count() * 1000000;
+                                            if (next_time.tv_nsec >= 1000000000)
+                                            {
+                                                next_time.tv_sec += next_time.tv_nsec / 1000000000;
+                                                next_time.tv_nsec %= 1000000000;
+                                            }
+#endif
                                            auto stop_token = runner_stop_source.get_token();
                                            while (!forever_stop_token.stop_requested() && !stop_token.stop_requested())
                                            {
                                                fn(std::forward<Args>(args)...);
                                                while (!forever_stop_token.stop_requested() && !stop_token.stop_requested())
                                                {
+#if defined(_WIN32) || defined(_WIN64)
                                                    LARGE_INTEGER current_time;
                                                    ::QueryPerformanceCounter(&current_time);
                                                    if (current_time.QuadPart >= next_time.QuadPart)
@@ -221,13 +239,41 @@ namespace ctd
                                                    const LONGLONG remaining = next_time.QuadPart - current_time.QuadPart;
                                                    const double remaining_ms = (remaining * 1000.0) / freq.QuadPart;
                                                    if (remaining_ms > 2.0)
-                                                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                                                       std::this_thread::sleep_for(std::chrono::milliseconds(1));
                                                    else
                                                        ::Sleep(0); // more high resolution wait, high cpu used.
                                                }
                                                next_time.QuadPart += interval_counts;
+#elif defined(__linux__)
+                                                   struct timespec current_time;
+                                                   clock_gettime(CLOCK_MONOTONIC, &current_time);
+                                                   if (current_time.tv_sec > next_time.tv_sec || (current_time.tv_sec == next_time.tv_sec && current_time.tv_nsec >= next_time.tv_nsec))
+                                                       break;
+                                                   struct timespec remaining;
+                                                   remaining.tv_sec = next_time.tv_sec - current_time.tv_sec;
+                                                   remaining.tv_nsec = next_time.tv_nsec - current_time.tv_nsec;
+                                                   if (remaining.tv_nsec < 0)
+                                                   {
+                                                       remaining.tv_sec--;
+                                                       remaining.tv_nsec += 1000000000;
+                                                   }
+                                                   const double remaining_ms = (remaining.tv_sec * 1000.0) + (remaining.tv_nsec / 1000000.0);
+                                                   if (remaining_ms > 2.0)
+                                                       std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                                                   else
+                                                       std::this_thread::yield();
+                                               }
+                                               next_time.tv_nsec += interval.count() * 1000000;
+                                               if (next_time.tv_nsec >= 1000000000)
+                                               {
+                                                   next_time.tv_sec += next_time.tv_nsec / 1000000000;
+                                                   next_time.tv_nsec %= 1000000000;
+                                               }
+#endif
                                            }
+#if defined(_WIN32) || defined(_WIN64)
                                            timeEndPeriod(1);
+#endif
                                        });
                 return register_task(name, id_promise.get_future().get(), task.share(), forever_stop_source);
             }
