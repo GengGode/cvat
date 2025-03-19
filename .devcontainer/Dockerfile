@@ -4,6 +4,7 @@ ARG REINSTALL_CMAKE_VERSION_FROM_SOURCE="3.22.2"
 
 # Optionally install the cmake for vcpkg
 COPY ./reinstall-cmake.sh /tmp/
+RUN /tmp/reinstall-cmake.sh
 
 RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
         chmod +x /tmp/reinstall-cmake.sh && /tmp/reinstall-cmake.sh ${REINSTALL_CMAKE_VERSION_FROM_SOURCE}; \
