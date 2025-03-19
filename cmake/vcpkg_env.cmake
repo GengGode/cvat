@@ -1,14 +1,25 @@
 # configure the vcpkg toolchain file
-# load VCPKG_ROOT from the environment
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+macro(set_vcpkg_config)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
     set(VCPKG_MANIFEST_MODE ON CACHE BOOL "Manifest mode")  
     set(VCPKG_MANIFEST_DIR ${CMAKE_SOURCE_DIR} CACHE PATH "Manifest directory")
+    if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+        if(WIN32)
+            set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "Vcpkg target triplet")
+        else()
+            set(VCPKG_TARGET_TRIPLET "x64-linux" CACHE STRING "Vcpkg target triplet")
+        endif()
+    endif()
     set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "Vcpkg target triplet")
     set(VCPKG_MANIFEST_INSTALL ON CACHE BOOL "Enable manifest install")
     set(VCPKG_APPLOCAL_DEPS ON CACHE BOOL "Enable applocal deps")
     set(VCPKG_INSTALLED_DIR ${CMAKE_BINARY_DIR}/vcpkg_installed)
+endmacro(set_vcpkg_config)
 
+
+# load VCPKG_ROOT from the environment
+if(DEFINED ENV{VCPKG_ROOT})
+    set_vcpkg_config()
     message(STATUS "VCPKG_ROOT found in the environment")
 else()
     # load VCPKG_ROOT from the .vcpkg-root file
@@ -18,14 +29,7 @@ else()
             message(FATAL_ERROR "VCPKG_ROOT not found in the .vcpkg-root file")
         endif()
         set(ENV{VCPKG_ROOT} "${VCPKG_ROOT}")
-        set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-        set(VCPKG_MANIFEST_MODE ON CACHE BOOL "Manifest mode")  
-        set(VCPKG_MANIFEST_DIR ${CMAKE_SOURCE_DIR} CACHE PATH "Manifest directory")
-        set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "Vcpkg target triplet")
-        set(VCPKG_MANIFEST_INSTALL ON CACHE BOOL "Enable manifest install")
-        set(VCPKG_APPLOCAL_DEPS ON CACHE BOOL "Enable applocal deps")
-        set(VCPKG_INSTALLED_DIR ${CMAKE_BINARY_DIR}/vcpkg_installed)
-
+        set_vcpkg_config()
         message(STATUS "VCPKG_ROOT found in the .vcpkg-root file")
     else()
         message(WARNING "VCPKG_ROOT not found in the environment or .vcpkg-root file
