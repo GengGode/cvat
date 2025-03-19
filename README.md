@@ -25,3 +25,16 @@ cmake -B build && cmake --build build
 - ImGui
 - Fmt
 - Spdlog
+
+## Using GitHub Codespaces
+
+1. Open the repository in GitHub Codespaces.
+2. Codespaces will automatically set up the development environment.
+3. CMake configure and build
+```shell
+cmake -B build && cmake --build build
+```
+4. Run the executable
+```shell
+.\build\bin\Release\cvat.exe
+```
