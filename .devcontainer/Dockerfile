@@ -7,10 +7,9 @@ ARG REINSTALL_CMAKE_VERSION_FROM_SOURCE="3.23"
  # Optionally install the cmake for vcpkg
 COPY ./reinstall-cmake.sh /tmp/
 
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive 
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends clang-format
 
 # Obtain vcpkg repository and set VCPKG_ROOT
 RUN git clone --depth 1 https://github.com/microsoft/vcpkg /vcpkg
 ENV VCPKG_ROOT="/vcpkg"
-
