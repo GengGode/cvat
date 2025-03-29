@@ -17,6 +17,9 @@ struct debugger_app::impl_t
 struct GLFWwindow;
 struct imgui_context
 {
+    struct impl_t;
+    ctd::ptr<impl_t> impl;
+
     std::shared_future<void> main_future;
     std::atomic<bool> is_running = true;
 
