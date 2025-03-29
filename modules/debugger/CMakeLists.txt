@@ -19,9 +19,16 @@ target_sources(debugger PRIVATE
 
 include(${deps_dir}/add_deps.cmake)
 add_deps(debugger WindowsHModular)
-  
+
+
+find_package(GLEW REQUIRED)
+target_link_libraries(debugger PRIVATE GLEW::GLEW)
+
 find_package(imgui CONFIG REQUIRED)
-target_link_libraries(debugger PRIVATE imgui::imgui glfw opengl32)
+target_link_libraries(debugger PRIVATE imgui::imgui glfw)
+if (WIN32)
+    target_link_libraries(debugger PRIVATE opengl32)
+endif()
 
 
 # source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})

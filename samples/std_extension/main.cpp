@@ -1,3 +1,4 @@
+#include <iostream>
 #include <ptr.hpp>
 #include <self_releasing_async.hpp>
 
@@ -49,6 +50,5 @@ int main()
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     std::cout << "end" << std::endl;
-
     return 0;
 }

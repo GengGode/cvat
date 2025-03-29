@@ -10,6 +10,13 @@ macro(set_vcpkg_config)
             set(VCPKG_TARGET_TRIPLET "x64-linux" CACHE STRING "Vcpkg target triplet")
         endif()
     endif()
+    if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+        if(WIN32)
+            set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "Vcpkg target triplet")
+        else()
+            set(VCPKG_TARGET_TRIPLET "x64-linux" CACHE STRING "Vcpkg target triplet")
+        endif()
+    endif()
     set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "Vcpkg target triplet")
     set(VCPKG_MANIFEST_INSTALL ON CACHE BOOL "Enable manifest install")
     set(VCPKG_APPLOCAL_DEPS ON CACHE BOOL "Enable applocal deps")
@@ -18,9 +25,8 @@ endmacro(set_vcpkg_config)
 
 
 # load VCPKG_ROOT from the environment
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+if(DEFINED ENV{VCPKG_ROOT})
     set_vcpkg_config()
-
     message(STATUS "VCPKG_ROOT found in the environment")
 else()
     # load VCPKG_ROOT from the .vcpkg-root file
