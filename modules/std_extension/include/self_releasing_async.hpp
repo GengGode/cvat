@@ -162,7 +162,7 @@ namespace ctd
                                        [this, &id_promise, forever_stop_token = std::move(forever_stop_token), interval, fn = std::forward<Fn>(fn), ... args = std::forward<Args>(args)]() mutable {
                                            id_promise.set_value(std::this_thread::get_id());
 
-                                           timeBeginPeriod(1);  
+                                           timeBeginPeriod(1);
                                            auto next_until = std::chrono::high_resolution_clock::now() + interval;
 
                                            auto stop_token = runner_stop_source.get_token();
@@ -221,7 +221,7 @@ namespace ctd
                                                    const LONGLONG remaining = next_time.QuadPart - current_time.QuadPart;
                                                    const double remaining_ms = (remaining * 1000.0) / freq.QuadPart;
                                                    if (remaining_ms > 2.0)
-                                                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                                                       std::this_thread::sleep_for(std::chrono::milliseconds(1));
                                                    else
                                                        ::Sleep(0); // more high resolution wait, high cpu used.
                                                }
@@ -272,7 +272,7 @@ namespace ctd
 
     struct self_releasing_async
     {
-        detail::async_pool pool;
+        ctd::detail::async_pool pool;
 
         self_releasing_async() = default;
         ~self_releasing_async() = default;
