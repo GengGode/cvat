@@ -45,7 +45,7 @@ This repository includes GitHub Actions workflows for building and testing the p
 
 ### Build and Release Workflow
 
-The `build.yml` workflow is triggered on pushes and pull requests to the `main` branch. It performs the following steps:
+The `build.yml` workflow is triggered on pushes and pull requests to the `master` branch. It performs the following steps:
 
 1. Checks out the code.
 2. Sets up the vcpkg environment.
@@ -55,7 +55,7 @@ The `build.yml` workflow is triggered on pushes and pull requests to the `main` 
 
 ### Test Workflow
 
-The `test.yml` workflow is triggered on pushes and pull requests to the `main` branch. It performs the following steps:
+The `test.yml` workflow is triggered on pushes and pull requests to the `master` branch. It performs the following steps:
 
 1. Checks out the code.
 2. Sets up the vcpkg environment.
@@ -63,4 +63,4 @@ The `test.yml` workflow is triggered on pushes and pull requests to the `main` b
 4. Runs the tests.
 5. Uploads the test results as artifacts.
 
-To use these workflows, simply push your changes to the `main` branch or create a pull request targeting the `main` branch. The workflows will be automatically triggered, and you can monitor their progress in the Actions tab of your repository.
+To use these workflows, simply push your changes to the `master` branch or create a pull request targeting the `master` branch. The workflows will be automatically triggered, and you can monitor their progress in the Actions tab of your repository.
