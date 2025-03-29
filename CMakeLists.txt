@@ -8,5 +8,6 @@ include(cmake/project_setting.cmake)
 
 add_subdirectory(modules/std_extension)  
 add_subdirectory(modules/debugger)  
+add_subdirectory(modules/frame_source)  
 
 add_subdirectory(samples)  
