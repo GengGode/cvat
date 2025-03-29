@@ -1,10 +1,14 @@
 #pragma once
-#include <debugger.h>
+#include <debugger_abi.h>
+#include <self_releasing_async.hpp>
 
-class debugger_app : public debugger
+class debugger_app : public debugger_abi
 {
     struct impl_t;
     ctd::ptr<impl_t> impl;
+
+public:
+    ctd::ptr<ctd::self_releasing_async> pool = std::make_shared<ctd::self_releasing_async>();
 
 public:
     debugger_app();

@@ -6,9 +6,9 @@ struct frame_source;
 struct info_parser;
 struct status_context;
 
-struct debugger
+struct debugger_abi
 {
-    virtual ~debugger() = default;
+    virtual ~debugger_abi() = default;
 
     virtual void execute() = 0;
     virtual void stop() = 0;

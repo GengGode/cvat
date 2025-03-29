@@ -1,5 +1,6 @@
-#include "app_impl.hpp"
 #include <debugger_app.hpp>
+
+#include "app_impl.hpp"
 
 #include <future>
 #include <iostream>
